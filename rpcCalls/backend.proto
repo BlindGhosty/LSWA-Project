@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+service GenerateFollowers {
+  rpc logic1(FollowerRequest) returns (RecommendationReply) {}
+  rpc logic2(FollowerRequest) returns (RecommendationReply) {}
+  rpc logic3(FollowerRequest) returns (RecommendationReply) {}
+  rpc logic4(FollowerRequest) returns (RecommendationReply) {}
+
+  //rpc reduce(listOfusers) return (...) {}
+}
+
+message FollowerRequest {
+  string MainUser = 1;
+  repeated string Subscriptions = 2;
+
+  // Name -> DB -> stuff
+  // User -> stuff -> DB
+}
+
+message RecommendationReply {
+  repeated string Users = 1;
+}
+
+message listOfUsers {
+  repeated string names = 1;
+}
