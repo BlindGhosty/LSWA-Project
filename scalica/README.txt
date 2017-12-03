@@ -23,6 +23,7 @@ $ python manage.py migrate
 Run the server:
 $ source ./env/bin/activate
 $ cd web/scalica
+$ python manage.py flush //this clears the db!!!
 $ python manage.py runserver
 
 Access the site at http://localhost:8000/micro

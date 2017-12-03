@@ -7,6 +7,8 @@ from django.shortcuts import render
 from django.utils import timezone
 from .models import Following, Post, FollowingForm, PostForm, MyUserCreationForm
 
+from django.views.generic import ListView
+from django.views.generic import DetailView
 
 # Anonymous views
 #################
@@ -110,19 +112,12 @@ def follow(request):
     form = FollowingForm
   return render(request, 'micro/follow.html', {'form' : form})
 
+# Our Recommendation Service:
+#############################
 @login_required
 def recommend(request):
-    try:
-      my_post = Post.objects.filter(user=request.user).order_by('-pub_date')[0]
-    except IndexError:
-      my_post = None
-    follows = [o.followee_id for o in Following.objects.filter(
-      follower_id=request.user.id)]
-    post_list = Post.objects.filter(
-        user_id__in=follows).order_by('-pub_date')[0:10]
+    query_results = Following.objects.filter(follower_id=request.user).order_by('-follow_date')
     context = {
-      'post_list': post_list,
-      'my_post' : my_post,
-      'post_form' : PostForm
+        'stuff': query_results,
     }
     return render(request, 'micro/recommend.html', context)
