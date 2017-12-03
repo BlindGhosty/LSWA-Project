@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+service GenerateFollowers {
+  rpc logic1(FollowerRequest) return (RecommendationReply) {}
+  rpc logic2(FollowerRequest) return (RecommendationReply) {}
+  rpc logic3(FollowerRequest) return (RecommendationReply) {}
+  rpc logic4(FollowerRequest) return (RecommendationReply) {}
+
+  rpc reduce(...) return (...) {}
+}
+
+message FollowerRequest {
+  string MainUser = 1;
+  repeated string Subscriptions = 2;
+
+  // Name -> DB -> stuff
+  // User -> stuff -> DB
+}
+
+message RecommendationReply {
+  repeated String Users = 1;
+}
+*/
+
+2 parts--
+I: Online component -> User requesting their recommendations
+II: Offline component -> We're calculating with RPCs!
