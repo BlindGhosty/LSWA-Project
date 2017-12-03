@@ -24,6 +24,11 @@ class Following(models.Model):
   def __str__(self):
     return self.follower.username + "->" + self.followee.username
 
+# Our recommendation model(s):
+class Recommendation(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    recommended_users = models.ForeignKey(settings.AUTH_USER_MODEL)
+
 # Model Forms
 class PostForm(ModelForm):
   class Meta:
