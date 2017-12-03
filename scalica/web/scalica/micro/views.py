@@ -5,7 +5,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
-from .models import Following, Post, FollowingForm, PostForm, MyUserCreationForm
+from .models import Following, Post, FollowingForm, PostForm, MyUserCreationForm, Recommendation
 
 from django.views.generic import ListView
 from django.views.generic import DetailView
@@ -116,8 +116,14 @@ def follow(request):
 #############################
 @login_required
 def recommend(request):
-    query_results = Following.objects.filter(follower_id=request.user).order_by('-follow_date')
+    follow_results = Following.objects.filter(follower_id=request.user).order_by('-follow_date')
+    try:
+        rec_results = Recommendation.objects.filter(user=request.user)
+    except:
+        print 'problem?'
+
     context = {
-        'stuff': query_results,
+        'follows': follow_results,
+        'recs': rec_results,
     }
     return render(request, 'micro/recommend.html', context)

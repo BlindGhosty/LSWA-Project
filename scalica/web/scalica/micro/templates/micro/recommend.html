@@ -10,32 +10,53 @@
 {% block content %}
 <h1> TODO: Put the recs here </h1>
 <div>
-  <table id="recList">
-  <!-- put the list of users into this table -->
+  <table id="recList"> <h2> People I follow: </h2>
     <tr>
-      <th>
-        Follower
-      </th>
-      <td>
-        follows
-      </td>
-      <th>
-        Followee
-      </th>
+      <th> Follower </th>
+      <td> follows </td>
+      <th> Followee </th>
     </tr>
-    {% for rec in stuff %}
+    {% if follows %}
+    {% for user in follows %}
     <tr>
       <td>
         <img src="{% static "micro/images/user_s.png" %}" alt="Generic User"/>
-        {{ rec.follower.username}}
+        {{ user.follower.username}}
       </td>
       <td> </td>
       <td>
         <img src="{% static "micro/images/user_s.png" %}" alt="Generic User"/>
-        {{ rec.followee.username}}
+        {{ user.followee.username}}
       </td>
     </tr>
     {% endfor %}
+    {% endif %}
+  </table>
+
+  <br>
+
+  <table id="recList"> <h2> People I might want to follow: </h2>
+    <tr>
+      <th> Follower </th>
+      <td> follows </td>
+      <th> Followee </th>
+    </tr>
+
+    {% if recs %}
+      {% for rec in recs %}
+      <tr>
+        <td>
+          <img src="{% static "micro/images/user_s.png" %}" alt="Generic User"/>
+          {{ rec.user.username }}
+        </td>
+        <td> </td>
+        <td>
+          <img src="{% static "micro/images/user_s.png" %}" alt="Generic User"/>
+          {{ rec.recommended_user.username }}
+        </td>
+      </tr>
+      {% endfor %}
+    {% endif %}
   </table>
 </div>
 {% endblock %}

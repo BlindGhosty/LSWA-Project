@@ -10,9 +10,9 @@ User = get_user_model()
 
 users = []
 
-for i in range(100):
-	newusername = 'b' + str(i)
-	users.append((newusername,'1'))
+for i in range(20):
+	newusername = 'seed' + str(i)
+	users.append((newusername,'pass'))
 
 for username, password in users:
 	try:
@@ -25,5 +25,6 @@ for username, password in users:
 		print 'User {0} successfully created.'.format(username)
 	except:
 		print 'There was a problem creating the user: {0}. Error:{1}.'.format(username, sys.exc_info()[1])
+print 'Finished populating user list'
 
-
+# now how to do the following logic?
