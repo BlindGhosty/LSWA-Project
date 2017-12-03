@@ -116,7 +116,7 @@ def follow(request):
 #############################
 @login_required
 def recommend(request):
-    query_results = Following.objects.all()
+    query_results = Following.objects.filter(follower_id=request.user).order_by('-follow_date')
     context = {
         'stuff': query_results,
     }

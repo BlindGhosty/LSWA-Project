@@ -26,8 +26,10 @@ class Following(models.Model):
 
 # Our recommendation model(s):
 class Recommendation(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    recommended_users = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                            related_name="user_to_rec_for")
+    recommended_users = models.ForeignKey(settings.AUTH_USER_MODEL,
+                            related_name="users_recommended")
 
 # Model Forms
 class PostForm(ModelForm):
