@@ -1,0 +1,31 @@
+{% extends "micro/base.html" %}
+{% load humanize %}
+{% load staticfiles %}
+
+{% block sidebar %}
+<img src="{% static "micro/images/user.png" %}" alt="Generic User"/> <br>
+{{ user.username }} <p>
+{% endblock %}
+
+{% block content %}
+<h1> TODO: Put the recs here </h1>
+<div>
+  {% if rec_list %}
+  <table id="recList">
+    {% for rec in rec_list %}
+    <tr>
+      <td>
+        <img src="{% static "micro/images/user_s.png" %}" alt="Generic User"/>
+      </td>
+      <td>
+        {{rec.user.username}}
+        <!-- put the list of users into this table -->
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+    <p>No recommendations found? TODO!</p>
+  {% endif %}
+</div>
+{% endblock %}

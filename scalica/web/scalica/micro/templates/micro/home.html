@@ -1,10 +1,12 @@
 {% extends "micro/base.html" %}
 {% load humanize %}
 {% load staticfiles %}
+
 {% block sidebar %}
 <img src="{% static "micro/images/user.png" %}" alt="Generic User"/> <br>
 {{ user.username }} <p>
 {% endblock %}
+
 {% block content %}
 <div id="status">
 {% if my_post %}

@@ -19,7 +19,7 @@ def index(request):
 def anon_home(request):
   return render(request, 'micro/public.html')
 
-def stream(request, user_id):  
+def stream(request, user_id):
   # See if to present a 'follow' button
   form = None
   if request.user.is_authenticated() and request.user.id != int(user_id):
@@ -36,7 +36,7 @@ def stream(request, user_id):
     posts = paginator.page(page)
   except PageNotAnInteger:
     # If page is not an integer, deliver first page.
-    posts = paginator.page(1) 
+    posts = paginator.page(1)
   except EmptyPage:
     # If page is out of range (e.g. 9999), deliver last page of results.
     posts = paginator.page(paginator.num_pages)
@@ -109,3 +109,20 @@ def follow(request):
   else:
     form = FollowingForm
   return render(request, 'micro/follow.html', {'form' : form})
+
+@login_required
+def recommend(request):
+    try:
+      my_post = Post.objects.filter(user=request.user).order_by('-pub_date')[0]
+    except IndexError:
+      my_post = None
+    follows = [o.followee_id for o in Following.objects.filter(
+      follower_id=request.user.id)]
+    post_list = Post.objects.filter(
+        user_id__in=follows).order_by('-pub_date')[0:10]
+    context = {
+      'post_list': post_list,
+      'my_post' : my_post,
+      'post_form' : PostForm
+    }
+    return render(request, 'micro/recommend.html', context)
