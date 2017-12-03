@@ -1,4 +1,5 @@
 import grpc
+# Importing Scalica models? from django.db import models
 
 class GenerateFollowersServicer(backend_pb2_grpc.GenerateFollowersServicer):
     def logic1(self, request, context):
@@ -16,7 +17,7 @@ class GenerateFollowersServicer(backend_pb2_grpc.GenerateFollowersServicer):
     def logic4(self, request, context):
         # TODO
         return backend_pb2.RecommendationReply(Users=)
-    
+
 def serve():
   server = grpc.server(futures.ThreadPoolExecutor(max_workers=10)) #Change the max???
   debate_pb2_grpc.add_GenerateFollowersServicer_to_server(
