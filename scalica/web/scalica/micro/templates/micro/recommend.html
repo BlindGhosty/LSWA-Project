@@ -11,14 +11,28 @@
 <h1> TODO: Put the recs here </h1>
 <div>
   <table id="recList">
+  <!-- put the list of users into this table -->
+    <tr>
+      <th>
+        Follower
+      </th>
+      <td>
+        follows
+      </td>
+      <th>
+        Followee
+      </th>
+    </tr>
     {% for rec in stuff %}
     <tr>
       <td>
         <img src="{% static "micro/images/user_s.png" %}" alt="Generic User"/>
+        {{ rec.follower.username}}
       </td>
+      <td> </td>
       <td>
-        {{ rec.follower.username}} -> {{rec.followee.username}}
-        <!-- put the list of users into this table -->
+        <img src="{% static "micro/images/user_s.png" %}" alt="Generic User"/>
+        {{ rec.followee.username}}
       </td>
     </tr>
     {% endfor %}
