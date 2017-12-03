@@ -8,8 +8,8 @@
 <body>
   <div id="header">
     {% if user.is_authenticated %}
-      <a href="/micro/">{{ user.username }}
-       - <a href="{% url 'micro:logout' %}">Log Out</a> -  
+      <a href="/micro/">{{ user.username }}</a> - 
+      <a href="{% url 'micro:logout' %}">Log Out</a> -  
       <a href="/micro/recommend">Recommendations</a>
     {% else %}
       <a href="{% url 'micro:login' %}">Log In</a>
