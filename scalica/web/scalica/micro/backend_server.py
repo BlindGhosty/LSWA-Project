@@ -6,11 +6,17 @@ import time
 from concurrent import futures
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
+channel = grpc.insecure_channel('[localhost:8000]')
+stub = consulation_pb2_grpc.GenerateFollowersStub(channel)
+
 class GenerateFollowersServicer(backend_pb2_grpc.GenerateFollowersServicer):
     # Shouldn't request just send the usedId to gen recs for?
     def logic1(self, request, context):
         # TODO:
-        print request
+	
+        ff_id = stub.logic2()
+	
+	
         return backend_pb2.RecommendationReply(Users=[request.MainUserId])
 
     def logic2(self, request, context):
