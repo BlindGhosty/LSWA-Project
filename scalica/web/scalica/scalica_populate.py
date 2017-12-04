@@ -13,7 +13,7 @@ User = get_user_model()
 
 users = []
 
-for i in range(20):
+for i in range(30):
 	newusername = 'seed' + str(i)
 	users.append((newusername,'pass'))
 
@@ -37,29 +37,46 @@ followee_arr = []
 followee_str = ""
 follower_str = ""
 for i in range(6):
-	follower_str = "seed" + str(random.randint(0,19))
+	follower_str = "seed" + str(random.randint(0,29))
 	while follower_str in follower_arr:
-		follower_str = "seed" + str(random.randint(0,19))
-	followee_str = "seed" + str(random.randint(0,19))
+		follower_str = "seed" + str(random.randint(0,29))
+	followee_str = "seed" + str(random.randint(0,29))
 	while followee_str in followee_arr or followee_str in follower_arr:
-		followee_str = "seed" + str(random.randint(0,19))
+		followee_str = "seed" + str(random.randint(0,29))
 	follower_arr.append(follower_str)
 	followee_arr.append(followee_str)
-	print follower_str + "->" + followee_str
 
-while follower_str in follower_arr:
-        follower_str = "seed" + str(random.randint(0,19))
-while followee_str in followee_arr or followee_str in follower_arr:
-        followee_str = "seed" + str(random.randint(0,19))
+
+follower_str = "seed" + str(random.randint(0,29))
+followee_str = "seed" + str(random.randint(0,29))
 
 follower_arr.append(follower_str)
 followee_arr.append(followee_str)
 follower_arr.append(followee_str)
 followee_arr.append(follower_str)
 
+follower_str = "seed" + str(random.randint(0,29))
+for i in range(5):
+	followee_str = "seed" + str(random.randint(0,29))
+	while followee_str in followee_arr:
+		followee_str = "seed" + str(random.randint(0,29))
+	follower_arr.append(follower_str)
+	followee_arr.append(followee_str)
+	follower_str = followee_str
+
+followee_str = "seed" + str(random.randint(0,29))
+followerer_str = "seed" + str(random.randint(0,29))
+for i in range(4):
+	while follower_str in follower_arr:
+		follower_str = "seed" + str(random.randint(0,29))
+	followee_arr.append(followee_str)
+	follower_arr.append(follower_str)
+	followee_arr.append(follower_str)
+	follower_arr.append(followerer_str)
+
 
 print "This is the follow list"
-for i in range(6):
+for i in range(0, len(follower_arr)):
 	for usern in User.objects.all():
 		if usern.get_username() == follower_arr[i]:
 			follower_user = usern
@@ -67,6 +84,8 @@ for i in range(6):
 			followee_user = usern
 	followdouble = Following(follower=follower_user, followee=followee_user, follow_date=timezone.now())
 	followdouble.save()
-	print followdouble.__str__()
+
+for follow in Following.objects.all():
+	print follow.__str__()
 
 
