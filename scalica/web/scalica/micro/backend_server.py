@@ -6,7 +6,7 @@ import time
 from concurrent import futures
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
-channel = grpc.insecure_channel('[localhost:8000]')
+channel = grpc.insecure_channel('localhost:8000')
 stub = consulation_pb2_grpc.GenerateFollowersStub(channel)
 
 class GenerateFollowersServicer(backend_pb2_grpc.GenerateFollowersServicer):
@@ -35,7 +35,7 @@ def serve():
   server = grpc.server(futures.ThreadPoolExecutor(max_workers=10)) #Change the max???
   backend_pb2_grpc.add_GenerateFollowersServicer_to_server(
       GenerateFollowersServicer(), server)
-  server.add_insecure_port('localhost:20426') # Needs to be changed
+  server.add_insecure_port('localhost:8000') # Needs to be changed
   print "Starting RPC server..."
   server.start()
   try:
