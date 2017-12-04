@@ -47,7 +47,18 @@ for i in range(6):
 	followee_arr.append(followee_str)
 	print follower_str + "->" + followee_str
 
+while follower_str in follower_arr:
+        follower_str = "seed" + str(random.randint(0,19))
+while followee_str in followee_arr or followee_str in follower_arr:
+        followee_str = "seed" + str(random.randint(0,19))
 
+follower_arr.append(follower_str)
+followee_arr.append(followee_str)
+follower_arr.append(followee_str)
+followee_arr.append(follower_str)
+
+
+print "This is the follow list"
 for i in range(6):
 	for usern in User.objects.all():
 		if usern.get_username() == follower_arr[i]:
