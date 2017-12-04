@@ -6,22 +6,20 @@ service GenerateFollowers {
   rpc logic3(FollowerRequest) returns (RecommendationReply) {}
   rpc logic4(FollowerRequest) returns (RecommendationReply) {}
 
+  rpc test(FollowerRequest) returns (RecommendationReply) {}
+
   //rpc reduce(listOfusers) return (...) {}
 }
 
 //perhaps name this RecommendationRequest for clarity?
 message FollowerRequest {
-  string MainUser = 1;
-  repeated string Subscriptions = 2;
+  int32 MainUserId = 1;
+  repeated int32 SubscriptionsId = 2;
 
   // Name -> DB -> stuff
   // User -> stuff -> DB
 }
 
 message RecommendationReply {
-  repeated string Users = 1;
-}
-
-message listOfUsers {
-  repeated string names = 1;
+  repeated int32 Users = 1;
 }

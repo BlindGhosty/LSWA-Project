@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='backend.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\rbackend.proto\":\n\x0f\x46ollowerRequest\x12\x10\n\x08MainUser\x18\x01 \x01(\t\x12\x15\n\rSubscriptions\x18\x02 \x03(\t\"$\n\x13RecommendationReply\x12\r\n\x05Users\x18\x01 \x03(\t\"\x1c\n\x0blistOfUsers\x12\r\n\x05names\x18\x01 \x03(\t2\xe3\x01\n\x11GenerateFollowers\x12\x32\n\x06logic1\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x12\x32\n\x06logic2\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x12\x32\n\x06logic3\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x12\x32\n\x06logic4\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\rbackend.proto\">\n\x0f\x46ollowerRequest\x12\x12\n\nMainUserId\x18\x01 \x01(\x05\x12\x17\n\x0fSubscriptionsId\x18\x02 \x03(\x05\"$\n\x13RecommendationReply\x12\r\n\x05Users\x18\x01 \x03(\x05\"\x1c\n\x0blistOfUsers\x12\r\n\x05names\x18\x01 \x03(\x05\x32\xe3\x01\n\x11GenerateFollowers\x12\x32\n\x06logic1\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x12\x32\n\x06logic2\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x12\x32\n\x06logic3\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x12\x32\n\x06logic4\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x62\x06proto3')
 )
 
 
@@ -33,15 +33,15 @@ _FOLLOWERREQUEST = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='MainUser', full_name='FollowerRequest.MainUser', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
+      name='MainUserId', full_name='FollowerRequest.MainUserId', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='Subscriptions', full_name='FollowerRequest.Subscriptions', index=1,
-      number=2, type=9, cpp_type=9, label=3,
+      name='SubscriptionsId', full_name='FollowerRequest.SubscriptionsId', index=1,
+      number=2, type=5, cpp_type=1, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -59,7 +59,7 @@ _FOLLOWERREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=17,
-  serialized_end=75,
+  serialized_end=79,
 )
 
 
@@ -72,7 +72,7 @@ _RECOMMENDATIONREPLY = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='Users', full_name='RecommendationReply.Users', index=0,
-      number=1, type=9, cpp_type=9, label=3,
+      number=1, type=5, cpp_type=1, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -89,8 +89,8 @@ _RECOMMENDATIONREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=77,
-  serialized_end=113,
+  serialized_start=81,
+  serialized_end=117,
 )
 
 
@@ -103,7 +103,7 @@ _LISTOFUSERS = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='names', full_name='listOfUsers.names', index=0,
-      number=1, type=9, cpp_type=9, label=3,
+      number=1, type=5, cpp_type=1, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -120,8 +120,8 @@ _LISTOFUSERS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=115,
-  serialized_end=143,
+  serialized_start=119,
+  serialized_end=147,
 )
 
 DESCRIPTOR.message_types_by_name['FollowerRequest'] = _FOLLOWERREQUEST
@@ -158,8 +158,8 @@ _GENERATEFOLLOWERS = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=146,
-  serialized_end=373,
+  serialized_start=150,
+  serialized_end=377,
   methods=[
   _descriptor.MethodDescriptor(
     name='logic1',

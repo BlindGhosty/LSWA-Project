@@ -3,12 +3,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import Following, Post, FollowingForm, PostForm, MyUserCreationForm, Recommendation
 
-from django.views.generic import ListView
-from django.views.generic import DetailView
+import grpc
+import backend_pb2
+import backend_pb2_grpc
 
 # Anonymous views
 #################
@@ -57,7 +58,26 @@ def register(request):
     user = authenticate(username=new_user.username,
                         password=form.clean_password2())
     if user is not None:
-      login(request, user)
+        login(request, user)
+        """
+        so I think the mapping starts here at login
+        grab all the ids I follow, grab all the ids they follow
+            (+ grab stuff they follow???)
+            This would be easier if the rpc just had access to the same db as scalica
+        Then send the whole unsanitized list out?
+
+        On the rpc side, Take the list of ids. To scale, break up this list, but for now let's skip that.
+        Reduce the instances by counting the userIds up, send back to the scalica server
+
+        When scalica receives back a list of ids from the rpc,
+            save that to the recommendation db (should be cached tbh)
+            serve this on recommendation requests
+            ? If scalica doesn't have any suggestions, just shoot back random users?
+
+        ! Actually, what if the rpc just saved straight after it finished rather then send it back?
+        When a user logs in to Scalica, the appserver will send an RPC to your simple RPC server,
+        who will read the recommendations for the user and send them back to Scalica, where you will present them.
+        """
     else:
       raise Exception
     return home(request)
@@ -127,3 +147,12 @@ def recommend(request):
         'recs': rec_results,
     }
     return render(request, 'micro/recommend.html', context)
+
+@login_required
+def testRPC(request):
+    channel = grpc.insecure_channel('localhost:20426')
+    stub = backend_pb2_grpc.GenerateFollowersStub(channel)
+    userId = request.user.id
+    followIds = Following.objects.filter(follower_id=request.user).values_list('followee_id', flat=True)
+    request = backend_pb2.FollowerRequest(MainUserId=userId, SubscriptionsId=followIds)
+    response = stub.logic1(request)
