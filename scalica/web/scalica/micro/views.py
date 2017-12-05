@@ -138,11 +138,7 @@ def follow(request):
 def recommend(request):
     # Should be by recommend date? Or Weight.
     follow_results = Following.objects.filter(follower_id=request.user).order_by('-follow_date')
-    try:
-        rec_results = Recommendation.objects.filter(user=request.user)
-    except:
-        print 'problem?'
-
+    rec_results = Recommendation.objects.filter(user=request.user)
     context = {
         'follows': follow_results,
         'recs': rec_results,
@@ -166,8 +162,6 @@ def testRPC(request):
     response = stub.logic1(request_to_back) # So the grpc should reduce and give clean list back
 
     if response:
-        # print response
-        print "The recommendation is that you for user " +  User.objects.get(id=response.Users[0]).username
         for otherUserId in response.Users:
             mainUser = User.objects.get(id=userId)
             otherUser = User.objects.get(id=otherUserId)
@@ -175,7 +169,7 @@ def testRPC(request):
             rec.save()
         # So save to recommend list!
     else:
-        print "No users to recommend for you."
+        print "No users to recommend?"
 
     follow_results = Following.objects.filter(follower_id=request.user).order_by('-follow_date')
     rec_results = Recommendation.objects.filter(user_id=request.user)
