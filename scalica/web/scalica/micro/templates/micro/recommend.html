@@ -8,22 +8,11 @@
 {% endblock %}
 
 {% block content %}
-<h1> TODO: Put the recs here </h1>
 <div>
   <table id="recList"> <h2> People I follow: </h2>
-    <tr>
-      <th> Follower </th>
-      <td> follows </td>
-      <th> Followee </th>
-    </tr>
     {% if follows %}
     {% for user in follows %}
     <tr>
-      <td>
-        <img src="{% static "micro/images/user_s.png" %}" alt="Generic User"/>
-        {{ user.follower.username}}
-      </td>
-      <td> </td>
       <td>
         <img src="{% static "micro/images/user_s.png" %}" alt="Generic User"/>
         {{ user.followee.username}}
