@@ -34,6 +34,11 @@ class GenerateFollowersStub(object):
         request_serializer=backend__pb2.FollowerRequest.SerializeToString,
         response_deserializer=backend__pb2.RecommendationReply.FromString,
         )
+    self.test = channel.unary_unary(
+        '/GenerateFollowers/test',
+        request_serializer=backend__pb2.FollowerRequest.SerializeToString,
+        response_deserializer=backend__pb2.RecommendationReply.FromString,
+        )
 
 
 class GenerateFollowersServicer(object):
@@ -68,6 +73,13 @@ class GenerateFollowersServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def test(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_GenerateFollowersServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -88,6 +100,11 @@ def add_GenerateFollowersServicer_to_server(servicer, server):
       ),
       'logic4': grpc.unary_unary_rpc_method_handler(
           servicer.logic4,
+          request_deserializer=backend__pb2.FollowerRequest.FromString,
+          response_serializer=backend__pb2.RecommendationReply.SerializeToString,
+      ),
+      'test': grpc.unary_unary_rpc_method_handler(
+          servicer.test,
           request_deserializer=backend__pb2.FollowerRequest.FromString,
           response_serializer=backend__pb2.RecommendationReply.SerializeToString,
       ),

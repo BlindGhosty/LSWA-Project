@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+service GenerateFollowers {
+  rpc logic1(FollowerRequest) returns (RecommendationReply) {}
+  rpc logic2(FollowerRequest) returns (RecommendationReply) {}
+  rpc logic3(FollowerRequest) returns (RecommendationReply) {}
+  rpc logic4(FollowerRequest) returns (RecommendationReply) {}
+
+  rpc test(FollowerRequest) returns (RecommendationReply) {}
+
+  //rpc reduce(listOfusers) return (...) {}
+}
+
+//perhaps name this RecommendationRequest for clarity?
+message FollowerRequest {
+  int32 MainUserId = 1;
+  repeated int32 SubscriptionsId = 2;
+  repeated int32 PossFollowersId = 3;
+
+  // Name -> DB -> stuff
+  // User -> stuff -> DB
+}
+
+message RecommendationReply {
+  repeated int32 Users = 1;
+}

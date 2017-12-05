@@ -13,10 +13,12 @@ class GenerateFollowersServicer(backend_pb2_grpc.GenerateFollowersServicer):
     # Shouldn't request just send the usedId to gen recs for?
     def logic1(self, request, context):
         # TODO:
+        print request
         ff_ret = []
         for i in request.PossFollowersId:
-          if i not in request.subscriptionID and i != request.MainUserId:
+          if i not in request.SubscriptionsId and i != request.MainUserId:
             ff_ret.append(i)
+        print ff_ret
         return backend_pb2.RecommendationReply(Users=ff_ret)
 
     def logic2(self, request, context):

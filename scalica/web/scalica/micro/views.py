@@ -160,9 +160,5 @@ def testRPC(request):
       request = backend_pb2.FollowerRequest(MainUserId=userId, SubscriptionsId=followIds, PossFollowersId=followIds2)
       response = stub.logic1(request)
       for x in response.Users:
-        rec = Recommendation(user=User.objects.get(id=i), recommended_user=User.objects.get(id=response.Users[0]))
+        rec = Recommendation(user=User.objects.get(id=userId), recommended_user=User.objects.get(id=response.Users[0]))
         rec.save();
-
-
-
-      

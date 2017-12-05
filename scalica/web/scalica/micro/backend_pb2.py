@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='backend.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\rbackend.proto\">\n\x0f\x46ollowerRequest\x12\x12\n\nMainUserId\x18\x01 \x01(\x05\x12\x17\n\x0fSubscriptionsId\x18\x02 \x03(\x05\"$\n\x13RecommendationReply\x12\r\n\x05Users\x18\x01 \x03(\x05\"\x1c\n\x0blistOfUsers\x12\r\n\x05names\x18\x01 \x03(\x05\x32\xe3\x01\n\x11GenerateFollowers\x12\x32\n\x06logic1\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x12\x32\n\x06logic2\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x12\x32\n\x06logic3\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x12\x32\n\x06logic4\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\rbackend.proto\"W\n\x0f\x46ollowerRequest\x12\x12\n\nMainUserId\x18\x01 \x01(\x05\x12\x17\n\x0fSubscriptionsId\x18\x02 \x03(\x05\x12\x17\n\x0fPossFollowersId\x18\x03 \x03(\x05\"$\n\x13RecommendationReply\x12\r\n\x05Users\x18\x01 \x03(\x05\x32\x95\x02\n\x11GenerateFollowers\x12\x32\n\x06logic1\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x12\x32\n\x06logic2\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x12\x32\n\x06logic3\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x12\x32\n\x06logic4\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x12\x30\n\x04test\x12\x10.FollowerRequest\x1a\x14.RecommendationReply\"\x00\x62\x06proto3')
 )
 
 
@@ -46,6 +46,13 @@ _FOLLOWERREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='PossFollowersId', full_name='FollowerRequest.PossFollowersId', index=2,
+      number=3, type=5, cpp_type=1, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -59,7 +66,7 @@ _FOLLOWERREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=17,
-  serialized_end=79,
+  serialized_end=104,
 )
 
 
@@ -89,44 +96,12 @@ _RECOMMENDATIONREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=81,
-  serialized_end=117,
-)
-
-
-_LISTOFUSERS = _descriptor.Descriptor(
-  name='listOfUsers',
-  full_name='listOfUsers',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='names', full_name='listOfUsers.names', index=0,
-      number=1, type=5, cpp_type=1, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=119,
-  serialized_end=147,
+  serialized_start=106,
+  serialized_end=142,
 )
 
 DESCRIPTOR.message_types_by_name['FollowerRequest'] = _FOLLOWERREQUEST
 DESCRIPTOR.message_types_by_name['RecommendationReply'] = _RECOMMENDATIONREPLY
-DESCRIPTOR.message_types_by_name['listOfUsers'] = _LISTOFUSERS
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 FollowerRequest = _reflection.GeneratedProtocolMessageType('FollowerRequest', (_message.Message,), dict(
@@ -143,13 +118,6 @@ RecommendationReply = _reflection.GeneratedProtocolMessageType('RecommendationRe
   ))
 _sym_db.RegisterMessage(RecommendationReply)
 
-listOfUsers = _reflection.GeneratedProtocolMessageType('listOfUsers', (_message.Message,), dict(
-  DESCRIPTOR = _LISTOFUSERS,
-  __module__ = 'backend_pb2'
-  # @@protoc_insertion_point(class_scope:listOfUsers)
-  ))
-_sym_db.RegisterMessage(listOfUsers)
-
 
 
 _GENERATEFOLLOWERS = _descriptor.ServiceDescriptor(
@@ -158,8 +126,8 @@ _GENERATEFOLLOWERS = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   options=None,
-  serialized_start=150,
-  serialized_end=377,
+  serialized_start=145,
+  serialized_end=422,
   methods=[
   _descriptor.MethodDescriptor(
     name='logic1',
@@ -192,6 +160,15 @@ _GENERATEFOLLOWERS = _descriptor.ServiceDescriptor(
     name='logic4',
     full_name='GenerateFollowers.logic4',
     index=3,
+    containing_service=None,
+    input_type=_FOLLOWERREQUEST,
+    output_type=_RECOMMENDATIONREPLY,
+    options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='test',
+    full_name='GenerateFollowers.test',
+    index=4,
     containing_service=None,
     input_type=_FOLLOWERREQUEST,
     output_type=_RECOMMENDATIONREPLY,
