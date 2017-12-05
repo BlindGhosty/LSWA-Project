@@ -155,12 +155,9 @@ def testRPC(request):
     userId = request.user.id
     followIds = Following.objects.filter(follower_id=request.user).values_list('followee_id', flat=True)
     for i in followIds:
-      follower2_id = User.objects.get(pk=i)
+      follower2_id = User.objects.get(id=i)
       followIds2 = Following.objects.filter(follower_id=follower2_id).values_list('followee_id', flat=True)
-      request_arr = []
-      for x in followIds2:
-        if x not in followIds:
-          request_arr.append(x)   
+      request = backend_pb2.FollowerRequest(MainUserId=userId, SubscriptionsId=followIds, PossFollowersId=followIds2)
       request = backend_pb2.FollowerRequest(MainUserId=userId, SubscriptionsId=request_arr)
       response = stub.logic1(request)
       if response:
