@@ -157,8 +157,8 @@ def testRPC(request):
     for i in followIds:
       follower2_id = User.objects.get(id=i)
       followIds2 = Following.objects.filter(follower_id=follower2_id).values_list('followee_id', flat=True)
-      request = backend_pb2.FollowerRequest(MainUserId=userId, SubscriptionsId=followIds, PossFollowersId=followIds2)
-      response = stub.logic1(request)
-      if response:
-        print "The recommendation is that you for user " +  User.objects.get(id=response[0]).username
-      
+      request = backend_pb2.FollowerRequest(MainUserId=userId, SubscriptionsId=followIds)
+      for i in followIds2:
+        if i not in followIds:
+          print i
+          break;      
