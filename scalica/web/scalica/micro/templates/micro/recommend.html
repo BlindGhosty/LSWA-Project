@@ -36,20 +36,9 @@
   <br>
 
   <table id="recList"> <h2> People I might want to follow: </h2>
-    <tr>
-      <th> Follower </th>
-      <td> follows </td>
-      <th> Followee </th>
-    </tr>
-
     {% if recs %}
       {% for rec in recs %}
       <tr>
-        <td>
-          <img src="{% static "micro/images/user_s.png" %}" alt="Generic User"/>
-          {{ rec.user.username }}
-        </td>
-        <td> </td>
         <td>
           <img src="{% static "micro/images/user_s.png" %}" alt="Generic User"/>
           {{ rec.recommended_user.username }}
