@@ -16,11 +16,11 @@ class GenerateFollowersServicer(backend_pb2_grpc.GenerateFollowersServicer):
 
         #pass in the first followee of follower 
 	      #check if 
-        ff_ret = None
-        for i in ff_id:
+        ff_ret = []
+        for i in request.PossFollowersId:
           if i not in request.subscriptionID and i != request.MainUserId:
-            print i;
-            ff_ret = i
+            print "we recommend you follow the user with the user_id:" + str(i)
+            ff_ret.append(i)
             break;
         return backend_pb2.RecommendationReply(Users=ff_ret)
 
