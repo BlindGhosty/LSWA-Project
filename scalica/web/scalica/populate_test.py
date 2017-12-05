@@ -13,7 +13,7 @@ User = get_user_model()
 
 users = []
 
-newusername = 'live_demo'
+newusername = 'Alex_Lifeson'
 users.append((newusername,'pass'))
 for i in range(15):
 	newusername = 'phish_fan' + str(i)
