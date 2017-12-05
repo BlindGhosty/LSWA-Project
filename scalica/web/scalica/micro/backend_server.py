@@ -15,17 +15,18 @@ class GenerateFollowersServicer(backend_pb2_grpc.GenerateFollowersServicer):
         # TODO:
 
         #pass in the first followee of follower 
-        ff_id = stub.logic2(MainUserId=request.subscriptionID[0],MainUserId=[])
 	      #check if 
+        ff_ret = None
         for i in ff_id:
-          if i not in request.subscriptionID and i != 
-	       
-        return backend_pb2.RecommendationReply(Users=[request.MainUserId])
+          if i not in request.subscriptionID and i != request.MainUserId:
+            print i;
+            ff_ret = i
+            break;
+        return backend_pb2.RecommendationReply(Users=ff_ret)
 
     def logic2(self, request, context):
         # TODO:
-
-        return backend_pb2.RecommendationReply(Users=)
+        return backend_pb2.RecommendationReply(Users=ff_list)
 
     def logic3(self, request, context):
         # TODO:

@@ -154,5 +154,10 @@ def testRPC(request):
     stub = backend_pb2_grpc.GenerateFollowersStub(channel)
     userId = request.user.id
     followIds = Following.objects.filter(follower_id=request.user).values_list('followee_id', flat=True)
-    request = backend_pb2.FollowerRequest(MainUserId=userId, SubscriptionsId=followIds)
+    for i in followIDs:
+      followIds2 = Following.objects.filter(follower_id=request.followIds[0]).values_list('followee_id', flat=True)
+      request = backend_pb2.FollowerRequest(MainUserId=userId, SubscriptionsId=followIDs, )
+    request2 = backend_pb2.FollowerRequest(MainUserId=followIds[0], SubscriptionsId=[]);
+    followIds2 = Following.objects.filter(follower_id=request.followIds[0]).values_list('followee_id', flat=True)
     response = stub.logic1(request)
+
