@@ -1,3 +1,4 @@
 *.pyc
+*.swp
 scalica/env/
 scalica/migrations/

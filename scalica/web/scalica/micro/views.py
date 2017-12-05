@@ -136,6 +136,7 @@ def follow(request):
 #############################
 @login_required
 def recommend(request):
+    # Should be by recommend date? Or Weight.
     follow_results = Following.objects.filter(follower_id=request.user).order_by('-follow_date')
     try:
         rec_results = Recommendation.objects.filter(user=request.user)
@@ -152,13 +153,35 @@ def recommend(request):
 def testRPC(request):
     channel = grpc.insecure_channel('localhost:20426')
     stub = backend_pb2_grpc.GenerateFollowersStub(channel)
+
     userId = request.user.id
     followIds = Following.objects.filter(follower_id=request.user).values_list('followee_id', flat=True)
+
+    # I guess we're mapping here.
+    recIds = []
     for i in followIds:
-      follower2_id = User.objects.get(id=i)
-      followIds2 = Following.objects.filter(follower_id=follower2_id).values_list('followee_id', flat=True)
-      request = backend_pb2.FollowerRequest(MainUserId=userId, SubscriptionsId=followIds, PossFollowersId=followIds2)
-      response = stub.logic1(request)
-      for x in response.Users:
-        rec = Recommendation(user=User.objects.get(id=userId), recommended_user=User.objects.get(id=response.Users[0]))
-        rec.save();
+      recIds.extend(Following.objects.filter(follower_id=i).values_list('followee_id', flat=True))
+
+    request_to_back = backend_pb2.FollowerRequest(MainUserId=userId, SubscriptionsId=recIds)
+    response = stub.logic1(request_to_back) # So the grpc should reduce and give clean list back
+
+    if response:
+        # print response
+        print "The recommendation is that you for user " +  User.objects.get(id=response.Users[0]).username
+        for otherUserId in response.Users:
+            mainUser = User.objects.get(id=userId)
+            otherUser = User.objects.get(id=otherUserId)
+            rec = Recommendation.objects.create(user=mainUser, recommended_user=otherUser)
+            rec.save()
+        # So save to recommend list!
+    else:
+        print "No users to recommend for you."
+
+    follow_results = Following.objects.filter(follower_id=request.user).order_by('-follow_date')
+    rec_results = Recommendation.objects.filter(user_id=request.user)
+
+    context = {
+        'follows': follow_results,
+        'recs': rec_results,
+    }
+    return render(request, 'micro/recommend.html', context)

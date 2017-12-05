@@ -4,7 +4,7 @@ import backend_pb2_grpc
 
 import time
 from concurrent import futures
-_ONE_DAY_IN_SECONDS = 60 * 60 * 24
+ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 channel = grpc.insecure_channel('localhost:20426')
 stub = backend_pb2_grpc.GenerateFollowersStub(channel)
@@ -13,13 +13,17 @@ class GenerateFollowersServicer(backend_pb2_grpc.GenerateFollowersServicer):
     # Shouldn't request just send the usedId to gen recs for?
     def logic1(self, request, context):
         # TODO:
-        print request
+
+        #pass in the first followee of follower
+	      #check if
+        """
         ff_ret = []
         for i in request.PossFollowersId:
           if i not in request.SubscriptionsId and i != request.MainUserId:
             ff_ret.append(i)
-        print ff_ret
-        return backend_pb2.RecommendationReply(Users=ff_ret)
+        """
+        toReturn = list(set(request.SubscriptionsId))
+        return backend_pb2.RecommendationReply(Users=toReturn)
 
     def logic2(self, request, context):
         # TODO:
@@ -42,7 +46,7 @@ def serve():
   server.start()
   try:
     while True:
-      time.sleep(_ONE_DAY_IN_SECONDS)
+      time.sleep(ONE_DAY_IN_SECONDS)
   except KeyboardInterrupt:
     server.stop(0)
 
