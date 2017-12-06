@@ -107,14 +107,6 @@ DATABASES = {
       'read_default_file': os.path.join(BASE_DIR, '..', '..', 'db', 'my.cnf'),
     },
   },
-  'external' : {
-    'ENGINE': 'django.db.backends.mysql',
-    'NAME': 'external_database',
-    'USER': 'external_database_user',
-    'PASSWORD' : '0',
-    'HOST' : 'localhost',
-    'PORT' : '22222',
-  }
 }
 
 # Database routers go here:
