@@ -45,7 +45,9 @@ def batch_wrapper():
     # batch job downtime in seconds
     while True:
         start_time = time.time()
+        print "Starting batch job..."
         batch_recommend()
+        print "Finished batch job!"
         diff_time = time.time() - start_time
         if (diff_time < ONE_DAY_IN_SECONDS):
             time.sleep(ONE_DAY_IN_SECONDS - diff_time)
@@ -62,7 +64,7 @@ def batch_recommend():
 def single_recommend(user_id):
     stale_query = "SELECT gen_date FROM micro_time_recommendation_given where user_id = %s"
     follow_query = "SELECT followee_id FROM micro_following WHERE follower_id = %s"
-    add_recommendation = "INSERT INTO micro_recommendation VALUES (%s, %s, %s)"
+    add_recommendation = "INSERT INTO micro_recommendation VALUES (%s, %s, %s, %s)"
     insert_stale = "INSERT INTO micro_time_recommendation_given (user_id, gen_date) VALUES (%s, \'%s\')" # not sure this will work.
     update_stale = "UPDATE micro_time_recommendation_given SET gen_date = '%s' where user_id = %s"
 
@@ -73,7 +75,6 @@ def single_recommend(user_id):
     date = cursor.fetchone()
     today = datetime.datetime.now()
     if date is None:
-        print insert_stale % (user_id, today)
         cursor.execute(insert_stale % (user_id, today))
         db_connection.commit()
     else:
@@ -84,7 +85,6 @@ def single_recommend(user_id):
 
     cursor.execute(follow_query % user_id)
 
-    print user_id
     recommend_dict = {}
     followee_list = cursor.fetchall()
     for id in followee_list:
@@ -98,9 +98,9 @@ def single_recommend(user_id):
                 recommend_dict[temp_id] += 1
             else:
                 recommend_dict[temp_id] = 1
-    print recommend_dict
 
     # Saves user's recommendations
+    length = len(recommend_dict)
     for rec_id in recommend_dict:
         cursor = db_connection.cursor()
         cursor.execute("SELECT MAX(id) FROM micro_recommendation")
@@ -108,11 +108,27 @@ def single_recommend(user_id):
         if (id == None):
             id = 0
         id += 1
-        print rec_id
-        cursor.execute(add_recommendation % (id, user_id, rec_id))
+        weight = (float) (recommend_dict[rec_id]) / length
+        cursor.execute(add_recommendation % (id, user_id, rec_id, weight))
         db_connection.commit()
        # puts in recommendations one at a time--should be a batch insert?
     cursor.close()
+
+    """
+    Your email should include the following (in this order).
+Final demo stuff:
+1. Link (hostname/ip address) to your running demo. <- GCE instance
+2. Any special credentials to use, if that applies. <- which user to log in as Yair - nobodyKnowsWhatIsRush
+3. Special things you would like to to do / see in your online demo.
+    <- no way to check the rpc from a client side, + the batch job is always running.
+    ???
+
+Code submission stuff
+4. git link
+The code needs to include all the code you wrote, including script files and - if relevant - config files.
+Update <- requirements.txt
+You will get some bonus points for a well-documented README, in the top-level directory, that explains the code organization.
+"""
 
 
 def serve():
@@ -131,28 +147,12 @@ def serve():
 serve()
 
 """
-1. Populate
-    SIMPLE WITH 3
-    then 7
-    Simple, just create a test case for 100 users, who all follow one another randomly
-    Some way to visualize this???
-    Users with 5-10 followers of regular values...
-    Simple, do "Left vs Right bubbles"
-        (And then we have the libertarian have no friends)
-        (And we love pizza)
 2. RPC logic (use actual algorithms)
     logic1 <-- this will be our only call!
     USE MAP/REDUCE plz
 
 "Schedule"
-    1. WE add these features...
-    2. Then we need to update our deployment
     3. Send email to Yair
     4. pray.
 
-A -> C
-.....
-drop all recommendations I have saved
-A -> B -> C ??? A x B
-A -> C ??? (Answer no)
 """

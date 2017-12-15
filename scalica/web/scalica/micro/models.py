@@ -29,7 +29,10 @@ class Recommendation(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                             related_name="user_to_rec_for")
     recommended_user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                            related_name="users_recommended")
+                            related_name="user_recommended")
+    weight = models.DecimalField(max_digits=6, decimal_places=5, default=0.00000)
+    def __str__(self):
+      return self.follower.username + " ?-> " + self.followee.username
 
 class time_recommendation_given(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
