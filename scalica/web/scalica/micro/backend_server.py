@@ -3,9 +3,10 @@ import backend_pb2
 import backend_pb2_grpc
 
 import mysql.connector
+import datetime
 
 db_conf = {
-    "host" : "127.0.0.1",
+    "host" : "127.0.0.1", #needs to be changed if deployed
     "user" : "appserver",
     "password" : "foobarzoot",
     "database" : "scalica"
@@ -16,7 +17,7 @@ import time
 from concurrent import futures
 ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
-channel = grpc.insecure_channel('localhost:20426')
+channel = grpc.insecure_channel('localhost:20426') #also needs to be changed
 stub = backend_pb2_grpc.GenerateFollowersStub(channel)
 
 class GenerateFollowersServicer(backend_pb2_grpc.GenerateFollowersServicer):
@@ -71,14 +72,27 @@ def batch_recommend():
     """
 
 def single_recommend(user_id):
-    print "Start"
-    print user_id
+    stale_query = "SELECT gen_date FROM micro_time_recommendation_given where user_id = %s"
     follow_query = "SELECT followee_id FROM micro_following WHERE follower_id = %s"
     add_recommendation = "INSERT INTO micro_recommendation VALUES (%s, %s, %s)"
+    insert_stale = "INSERT INTO micro_time_recommendation_given (user_id, gen_date) VALUES (%s, \'%s\')" # not sure this will work.
+    update_stale = "UPDATE micro_time_recommendation_given SET gen_date = '%s' where user_id = %s"
 
     cursor = db_connection.cursor(buffered=True, dictionary=True)
+    cursor.execute(stale_query % user_id)
+    date = cursor.fetchone()
+    today = datetime.datetime.now()
+    if date is None:
+        print insert_stale % (user_id, today)
+        cursor.execute(insert_stale % (user_id, today))
+        db_connection.commit()
+    else
+        if today - date['gen_date'] < datetime.timedelta(1):
+            return
+        cursor.execute(update_stale % (today, user_id))
+        db_connection.commit()
+
     cursor.execute(follow_query % user_id)
-    # cursor now holds list of users that I follow
 
     recommend_dict = {}
     for id in cursor:

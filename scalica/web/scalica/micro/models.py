@@ -31,6 +31,11 @@ class Recommendation(models.Model):
     recommended_user = models.ForeignKey(settings.AUTH_USER_MODEL,
                             related_name="users_recommended")
 
+class time_recommendation_given(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                            related_name="user_with_rec")
+    gen_date = models.DateTimeField('recommend date')
+
 # Model Forms
 class PostForm(ModelForm):
   class Meta:
