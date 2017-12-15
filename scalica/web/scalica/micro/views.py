@@ -61,26 +61,12 @@ def register(request):
                         password=form.clean_password2())
     if user is not None:
         login(request, user)
-        # check
-        """
-        so I think the mapping starts here at login
-        grab all the ids I follow, grab all the ids they follow
-            (+ grab stuff they follow???)
-            This would be easier if the rpc just had access to the same db as scalica
-        Then send the whole unsanitized list out?
 
-        On the rpc side, Take the list of ids. To scale, break up this list, but for now let's skip that.
-        Reduce the instances by counting the userIds up, send back to the scalica server
-
-        When scalica receives back a list of ids from the rpc,
-            save that to the recommendation db (should be cached tbh)
-            serve this on recommendation requests
-            ? If scalica doesn't have any suggestions, just shoot back random users?
-
-        ! Actually, what if the rpc just saved straight after it finished rather then send it back?
-        When a user logs in to Scalica, the appserver will send an RPC to your simple RPC server,
-        who will read the recommendations for the user and send them back to Scalica, where you will present them.
-        """
+        channel = grpc.insecure_channel('localhost:20426') # TODO: Update here
+        stub = backend_pb2_grpc.GenerateFollowersStub(channel)
+        userId = request.user.id
+        request_to_back = backend_pb2.FollowerRequest(MainUserId=userId)
+        response = stub.logic1(request_to_back)
     else:
       raise Exception
     return home(request)

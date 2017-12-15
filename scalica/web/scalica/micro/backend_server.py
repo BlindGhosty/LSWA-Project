@@ -41,7 +41,6 @@ class GenerateFollowersServicer(backend_pb2_grpc.GenerateFollowersServicer):
         return backend_pb2.RecommendationReply(Users=-1)
 
 def batch_wrapper():
-    batch_recommend()
     margin = 600000000 # batch job downtime in seconds
     while True:
         start_time = time.time()
@@ -54,13 +53,10 @@ def batch_recommend():
     cursor = db_connection.cursor(buffered=True, dictionary=True)
     initial_query = "SELECT id FROM auth_user"
     cursor.execute(initial_query)
-    # cursor now holds all the relevant ids
-
     for id in cursor:
-        # check if the id is done first before calling this!
         single_recommend(id['id'])
     cursor.close()
-    # If problem, restart immediately and like warn somebod
+    # If problem, restart immediately and like warn somebody
 
 def single_recommend(user_id):
     stale_query = "SELECT gen_date FROM micro_time_recommendation_given where user_id = %s"
@@ -70,6 +66,8 @@ def single_recommend(user_id):
     update_stale = "UPDATE micro_time_recommendation_given SET gen_date = '%s' where user_id = %s"
 
     cursor = db_connection.cursor(buffered=True, dictionary=True)
+
+    # Checks if user got a rec in the last 24 hours--either from batch or req
     cursor.execute(stale_query % user_id)
     date = cursor.fetchone()
     today = datetime.datetime.now()
@@ -85,25 +83,24 @@ def single_recommend(user_id):
 
     cursor.execute(follow_query % user_id)
 
+    print user_id
     recommend_dict = {}
-    for id in cursor:
-        temp_cursor = db_connection.cursor(buffered=True)
-        temp_cursor.execute(follow_query % user_id)
-        temp_ids = temp_cursor.fetchall()
-        print temp_ids
-        for ids in temp_ids:
-            temp_id = ids[0]
+    followee_list = cursor.fetchall()
+    for id in followee_list:
+        cursor.execute(follow_query % id['followee_id'])
+        ids = cursor.fetchall()
+        for followee_id in ids:
+            temp_id = followee_id['followee_id']
+            if temp_id is user_id:
+                continue
             if (temp_id in recommend_dict.keys()):
-                print "found"
-                # recommend_dict[temp_id] = recommend_dict[temp_id] + 1
+                recommend_dict[temp_id] += 1
             else:
                 recommend_dict[temp_id] = 1
-        temp_cursor.close()
     print recommend_dict
-    # print recommend_dict
-    #
 
-    # for rec_id in recommend_set:
+    # Saves user's recommendations
+    # for rec_id in recommend_dict:
     #     cursor = db_connection.cursor()
     #     cursor.execute("SELECT MAX(id) FROM micro_recommendation")
     #     id = cursor.fetchone()[0]
@@ -144,21 +141,10 @@ serve()
 2. RPC logic (use actual algorithms)
     logic1 <-- this will be our only call!
     USE MAP/REDUCE plz
-3. Stale Data Checking / Test RPC on log-in... (look at cursor stuff)
-    This is what concerns me...
-    (Dumb) ideas:
-        1. We add the the USER model
-            How this is done, idk
-        2. We add to the Follower model
-            (becuase we don't care)
-        3. We store it the priority queue inside our server...
-4. Test RPC on log-in
-    Look for login
 
 "Schedule"
     1. WE add these features...
     2. Then we need to update our deployment
     3. Send email to Yair
     4. pray.
-
 """
