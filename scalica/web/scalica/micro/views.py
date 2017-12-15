@@ -90,7 +90,14 @@ def home(request):
 
 def rpcCall(id):
     try:
-        channel = grpc.insecure_channel('localhost:20426')
+        # TODO: Change me on deployment
+        import os
+        os.environ['production'] = False
+        channel = None
+        if os.environ['production']:
+            channel = grpc.insecure_channel('10.142.0.4')
+        else:
+            channel = grpc.insecure_channel('localhost:20426')
         stub = backend_pb2_grpc.GenerateFollowersStub(channel)
         request_to_back = backend_pb2.RecRequest(MainUserId=id)
         response = stub.gen_rec(request_to_back)

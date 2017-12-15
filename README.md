@@ -20,13 +20,13 @@ Logics:
 
 # Responsibilities:
 
-Matthew - Grouping weight + preventing cycles (Logic 2). + Setting up deployment environment
+Matthew - Grouping weight + preventing cycles (Logic 2 + 6). + Setting up deployment environment
 
-Rye - weighting by number of followers following (Logic 1). + Ensuring populate scripts work.
+Rye - weighting by number of followers following (Logic 1 + 6). + Ensuring populate scripts work.
 
 Malini - Going through the chain of subscriptions (Logic 3 + 5).
 
-Kelly - Shared following interest recommendation service via RPC service (Logic 4 + 6).
+Kelly - Shared following interest recommendation service via RPC service (Logic 4).
 
 # General Outline for the Project:
 

@@ -5,12 +5,28 @@ import backend_pb2_grpc
 import mysql.connector
 import datetime
 
-db_conf = {
-    "host" : "127.0.0.1", #needs to be changed when deployed
-    "user" : "appserver",
-    "password" : "foobarzoot",
-    "database" : "scalica"
-}
+from enum import Enum
+
+import os
+
+# TODO: Change when deployed
+os.environ['production'] = False
+db_connection = None
+db_conf = None
+if os.environ['production']:
+    db_conf = {
+        "host" : "35.196.52.82", #needs to be changed when deployed
+        "user" : "appserver",
+        "password" : "foobarzoot",
+        "database" : "scalica"
+    }
+else:
+    db_conf = {
+        "host" : "127.0.0.1",
+        "user" : "appserver",
+        "password" : "foobarzoot",
+        "database" : "scalica"
+    }
 db_connection = mysql.connector.connect(**db_conf)
 
 """
@@ -28,7 +44,6 @@ The code needs to include all the code you wrote, including script files and - i
 Update <- requirements.txt
 You will get some bonus points for a well-documented README, in the top-level directory, that explains the code organization.
 """
-
 
 import time
 from concurrent import futures
@@ -57,39 +72,42 @@ def batch_recommend():
     cursor.execute(initial_query)
     for id in cursor:
         single_recommend(id['id'])
+        similarity_recommend(id['id'])
     cursor.close()
     # TODO: If problem, restart immediately and like warn somebody?
 
-def single_recommend(user_id):
+class querys(Enum):
     stale_query = "SELECT gen_date FROM micro_time_recommendation_given where user_id = %s"
     followee_query = "SELECT followee_id FROM micro_following WHERE follower_id = %s"
     follower_query = "SELECT follower_id FROM micro_following WHERE followee_id = %s"
     add_recommendation = "INSERT INTO micro_recommendation VALUES (%s, %s, %s, %s)"
+    update_recommendation = "UPDATE micro_recommendation SET weight = %s where user_id = %s and recommended_user_id = %s
     insert_stale = "INSERT INTO micro_time_recommendation_given (user_id, gen_date) VALUES (%s, \'%s\')"
-    update_stale = "UPDATE micro_time_recommendation_given SET gen_date = '%s' where user_id = %s"
+    update_stale = "UPDATE micro_time_recommendation_given SET gen_date = \'%s\' where user_id = %s"
 
+def single_recommend(user_id):
     cursor = db_connection.cursor(buffered=True, dictionary=True)
 
     # Checks if user got a rec in the last 24 hours--either from batch or req
-    cursor.execute(stale_query % user_id)
+    cursor.execute(querys.stale_query % user_id)
     date = cursor.fetchone()
     today = datetime.datetime.now()
     if date is None:
-        cursor.execute(insert_stale % (user_id, today))
+        cursor.execute(querys.insert_stale % (user_id, today))
         db_connection.commit()
     else:
         if today - date['gen_date'] < datetime.timedelta(1):
             return
-        cursor.execute(update_stale % (today, user_id))
+        cursor.execute(querys.update_stale % (today, user_id))
         db_connection.commit()
 
-    cursor.execute(followee_query % user_id)
+    cursor.execute(querys.followee_query % user_id)
 
     recommend_dict = {}
     # A -> {B} -> C
     followee_list = cursor.fetchall()
     for id in followee_list:
-        cursor.execute(followee_query % id['followee_id'])
+        cursor.execute(querys.followee_query % id['followee_id'])
         ids = cursor.fetchall()
         for followee_id in ids:
             temp_id = followee_id['followee_id']
@@ -100,8 +118,7 @@ def single_recommend(user_id):
             else:
                 recommend_dict[temp_id] = 1
 
-    # TODO: B → A + A x B; A → B <- Easy! Makes 0 sense for social media
-    cursor.execute(follower_query % user_id)
+    cursor.execute(querys.follower_query % user_id)
     follower_list = cursor.fetchall() # list of people who follow user
 
     for id in follower_list:
@@ -119,12 +136,6 @@ def single_recommend(user_id):
         else:
             recommend_dict[temp_id] = 1
 
-
-    # A -> B -> … -> Z. sopop A -> Z <-- also expensive
-    #
-    # A → B; C → B; so A ←→ C <-- Map/Reduce problem; called on the batch; A → {B}; C → {B}; so A ← → C <-
-    #
-
     # Saves user's recommendations
     length = len(recommend_dict)
     for rec_id in recommend_dict:
@@ -135,12 +146,43 @@ def single_recommend(user_id):
             id = 0
         id += 1
         weight = (float) (recommend_dict[rec_id]) / length
-        cursor.execute(add_recommendation % (id, user_id, rec_id, weight))
+        cursor.execute(querys.add_recommendation % (id, user_id, rec_id, weight))
         db_connection.commit()
        # puts in recommendations one at a time--should be a batch insert?
     cursor.close()
 
+def similarity_recommend(user_id):
+    # Doing this efficiently??
+    recommend_dict = {}
+    cursor.execute(querys.followee_query % user_id)
+    followee_list = cursor.fetchall()
 
+    for id in followee_list:
+        cursor.execute(querys.follower_query % id['followee_id'])
+        ids = cursor.fetchall()
+        for followee_id in ids:
+            temp_id = followee_id['followee_id']
+            if temp_id is user_id:
+                continue
+            if (temp_id in recommend_dict.keys()):
+                recommend_dict[temp_id] += 1
+            else:
+                recommend_dict[temp_id] = 1
+
+    cursor.execute(querys.follower_query % user_id)
+    follower_list = cursor.fetchall() # list of people who follow user
+
+    length = len(recommend_dict)
+    for rec_id in recommend_dict:
+        cursor = db_connection.cursor()
+        cursor.execute("SELECT MAX(id) FROM micro_recommendation")
+        id = cursor.fetchone()[0]
+        if (id == None):
+            id = 0
+        id += 1
+        weight = (float) (recommend_dict[rec_id]) / length
+        cursor.execute(querys.add_recommendation % (id, user_id, rec_id, weight))
+        db_connection.commit()
 
 def serve():
   server = grpc.server(futures.ThreadPoolExecutor(max_workers=10)) #Change the max???
