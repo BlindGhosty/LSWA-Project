@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+service GenerateFollowers {
+  rpc gen_rec(RecRequest) returns (Void) {}
+}
+
+message RecRequest {
+  int32 MainUserId = 1;
+}
+
+message Void {
+
+}

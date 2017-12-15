@@ -1,0 +1,5 @@
+grpcio==1.7.3
+futures==3.2.0
+protobuf==3.5.0.post1
+grpc==0.3-19
+mysql_connector_repackaged==0.3.1
