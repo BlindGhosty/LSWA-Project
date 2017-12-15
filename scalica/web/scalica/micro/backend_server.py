@@ -100,17 +100,18 @@ def single_recommend(user_id):
     print recommend_dict
 
     # Saves user's recommendations
-    # for rec_id in recommend_dict:
-    #     cursor = db_connection.cursor()
-    #     cursor.execute("SELECT MAX(id) FROM micro_recommendation")
-    #     id = cursor.fetchone()[0]
-    #     if (id == None):
-    #         id = 0
-    #     id += 1
-    #     cursor.execute(add_recommendation % (id, user_id, rec_id[0]))
-    #     db_connection.commit()
-    #    puts in recommendations one at a time--should be a batch insert?
-    # cursor.close()
+    for rec_id in recommend_dict:
+        cursor = db_connection.cursor()
+        cursor.execute("SELECT MAX(id) FROM micro_recommendation")
+        id = cursor.fetchone()[0]
+        if (id == None):
+            id = 0
+        id += 1
+        print rec_id
+        cursor.execute(add_recommendation % (id, user_id, rec_id))
+        db_connection.commit()
+       # puts in recommendations one at a time--should be a batch insert?
+    cursor.close()
 
 
 def serve():
