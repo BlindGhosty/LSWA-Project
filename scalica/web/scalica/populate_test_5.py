@@ -71,12 +71,6 @@ temp_user.set_password(password)
 temp_user.save()
 assert authenticate(username=user_name, password=password)
 
-user_name = "Bubble3"
-temp_user = User.objects.create_user(username=user_name)
-temp_user.set_password(password)
-temp_user.save()
-assert authenticate(username=user_name, password=password)
-
 user_name = "FollowForFollow0"
 temp_user = User.objects.create_user(username=user_name)
 temp_user.set_password(password)
