@@ -95,7 +95,7 @@ def rpcCall(id):
         request_to_back = backend_pb2.RecRequest(MainUserId=id)
         response = stub.gen_rec(request_to_back)
     except:
-        print "Error sending try rpc call"
+        print "Error sending rpc call"
 
 # Allows to post something and shows my most recent posts.
 @login_required
@@ -128,9 +128,8 @@ def follow(request):
 #############################
 @login_required
 def recommend(request):
-    # Should be by recommend date? Or Weight.
     follow_results = Following.objects.filter(follower_id=request.user).order_by('-follow_date')
-    rec_results = Recommendation.objects.filter(user=request.user)
+    rec_results = Recommendation.objects.filter(user=request.user).order_by('-weight')
     context = {
         'follows': follow_results,
         'recs': rec_results,
