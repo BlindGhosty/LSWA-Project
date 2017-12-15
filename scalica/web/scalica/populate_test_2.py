@@ -48,7 +48,7 @@ while (k < TOTAL_USERS):
 
         if (next_index in duplicate_list == False):
             duplicate_list.append(i)
-            	followee_user = user_array[next_index]
+            followee_user = user_array[next_index]
             newFollow = Following(follower=follower_user, followee=followee_user, follow_date=timezone.now())
             newFollow.save()
         j += 1

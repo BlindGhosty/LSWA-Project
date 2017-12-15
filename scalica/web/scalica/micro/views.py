@@ -8,8 +8,9 @@ from django.utils import timezone
 from .models import Following, Post, FollowingForm, PostForm, MyUserCreationForm, Recommendation
 
 import grpc
-import backend_pb2
-import backend_pb2_grpc
+
+from .rpcCalls import backend_pb2
+from .rpcCalls import backend_pb2_grpc
 
 # Anonymous views
 #################
@@ -88,10 +89,13 @@ def home(request):
   return render(request, 'micro/home.html', context)
 
 def rpcCall(id):
-  channel = grpc.insecure_channel('localhost:20426')
-  stub = backend_pb2_grpc.GenerateFollowersStub(channel)
-  request_to_back = backend_pb2.FollowerRequest(MainUserId=id)
-  response = stub.logic1(request_to_back)
+    try:
+        channel = grpc.insecure_channel('localhost:20426')
+        stub = backend_pb2_grpc.GenerateFollowersStub(channel)
+        request_to_back = backend_pb2.RecRequest(MainUserId=id)
+        response = stub.gen_rec(request_to_back)
+    except:
+        print "Error sending try rpc call"
 
 # Allows to post something and shows my most recent posts.
 @login_required
