@@ -7,9 +7,11 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import Following, Post, FollowingForm, PostForm, MyUserCreationForm, Recommendation
 
+"""
 import grpc
 import backend_pb2
 import backend_pb2_grpc
+"""
 
 # Anonymous views
 #################
@@ -59,6 +61,7 @@ def register(request):
                         password=form.clean_password2())
     if user is not None:
         login(request, user)
+        # check
         """
         so I think the mapping starts here at login
         grab all the ids I follow, grab all the ids they follow
