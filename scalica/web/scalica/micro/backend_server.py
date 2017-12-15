@@ -41,12 +41,13 @@ class GenerateFollowersServicer(backend_pb2_grpc.GenerateFollowersServicer):
         return backend_pb2.RecommendationReply(Users=-1)
 
 def batch_wrapper():
-    margin = 600000000 # batch job downtime in seconds
+    # batch job downtime in seconds
     while True:
         start_time = time.time()
+        print start_time
         batch_recommend()
         diff_time = time.time() - start_time
-        if (diff_time < margin):
+        if (diff_time < ONE_DAY_IN_SECONDS):
             time.sleep(margin - diff_time)
 
 def batch_recommend():
