@@ -23,10 +23,11 @@ stub = backend_pb2_grpc.GenerateFollowersStub(channel)
 class GenerateFollowersServicer(backend_pb2_grpc.GenerateFollowersServicer):
     # Shouldn't request just send the usedId to gen recs for?
     def logic1(self, request, context):
-        single_recommend(request.SubscriptionsId)
+        print "Request received for recommendation of " + str(request.MainUserId)
+        single_recommend(request.MainUserId)
 
         # NO LONGER NEED TO RETURN ANYTHING
-        return backend_pb2.RecommendationReply(Users=toReturn)
+        return backend_pb2.RecommendationReply()
 
     def logic2(self, request, context):
         # TODO:
@@ -44,11 +45,10 @@ def batch_wrapper():
     # batch job downtime in seconds
     while True:
         start_time = time.time()
-        print start_time
         batch_recommend()
         diff_time = time.time() - start_time
         if (diff_time < ONE_DAY_IN_SECONDS):
-            time.sleep(margin - diff_time)
+            time.sleep(ONE_DAY_IN_SECONDS - diff_time)
 
 def batch_recommend():
     cursor = db_connection.cursor(buffered=True, dictionary=True)
@@ -149,4 +149,10 @@ serve()
     2. Then we need to update our deployment
     3. Send email to Yair
     4. pray.
+
+A -> C
+.....
+drop all recommendations I have saved
+A -> B -> C ??? A x B
+A -> C ??? (Answer no)
 """

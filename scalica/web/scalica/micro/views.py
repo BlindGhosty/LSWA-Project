@@ -7,11 +7,9 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import Following, Post, FollowingForm, PostForm, MyUserCreationForm, Recommendation
 
-"""
 import grpc
 import backend_pb2
 import backend_pb2_grpc
-"""
 
 # Anonymous views
 #################
@@ -61,12 +59,6 @@ def register(request):
                         password=form.clean_password2())
     if user is not None:
         login(request, user)
-
-        channel = grpc.insecure_channel('localhost:20426') # TODO: Update here
-        stub = backend_pb2_grpc.GenerateFollowersStub(channel)
-        userId = request.user.id
-        request_to_back = backend_pb2.FollowerRequest(MainUserId=userId)
-        response = stub.logic1(request_to_back)
     else:
       raise Exception
     return home(request)
@@ -92,7 +84,14 @@ def home(request):
     'my_post' : my_post,
     'post_form' : PostForm
   }
+  rpcCall(request.user.id) # Works here
   return render(request, 'micro/home.html', context)
+
+def rpcCall(id):
+  channel = grpc.insecure_channel('localhost:20426')
+  stub = backend_pb2_grpc.GenerateFollowersStub(channel)
+  request_to_back = backend_pb2.FollowerRequest(MainUserId=id)
+  response = stub.logic1(request_to_back)
 
 # Allows to post something and shows my most recent posts.
 @login_required
@@ -128,41 +127,6 @@ def recommend(request):
     # Should be by recommend date? Or Weight.
     follow_results = Following.objects.filter(follower_id=request.user).order_by('-follow_date')
     rec_results = Recommendation.objects.filter(user=request.user)
-    context = {
-        'follows': follow_results,
-        'recs': rec_results,
-    }
-    return render(request, 'micro/recommend.html', context)
-
-@login_required
-def testRPC(request):
-    channel = grpc.insecure_channel('localhost:20426')
-    stub = backend_pb2_grpc.GenerateFollowersStub(channel)
-
-    userId = request.user.id
-    followIds = Following.objects.filter(follower_id=request.user).values_list('followee_id', flat=True)
-
-    # I guess we're mapping here.
-    recIds = []
-    for i in followIds:
-      recIds.extend(Following.objects.filter(follower_id=i).values_list('followee_id', flat=True))
-
-    request_to_back = backend_pb2.FollowerRequest(MainUserId=userId, SubscriptionsId=recIds)
-    response = stub.logic1(request_to_back) # So the grpc should reduce and give clean list back
-
-    if response:
-        for otherUserId in response.Users:
-            mainUser = User.objects.get(id=userId)
-            otherUser = User.objects.get(id=otherUserId)
-            rec = Recommendation.objects.create(user=mainUser, recommended_user=otherUser)
-            rec.save()
-        # So save to recommend list!
-    else:
-        print "No users to recommend?"
-
-    follow_results = Following.objects.filter(follower_id=request.user).order_by('-follow_date')
-    rec_results = Recommendation.objects.filter(user_id=request.user)
-
     context = {
         'follows': follow_results,
         'recs': rec_results,

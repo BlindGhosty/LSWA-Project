@@ -11,6 +11,5 @@ urlpatterns = [
     url(r'^follow/$', views.follow, name='follow'),
     url(r'^register/$', views.register, name='register'),
     url(r'^recommend/$', views.recommend, name='recommend'),
-    url(r'^testRPC/$', views.testRPC, name='test'),
     url('^', include('django.contrib.auth.urls'))
 ]
