@@ -143,13 +143,17 @@ def single_recommend(user_id):
     # Saves user's recommendations
     for rec_id in recommend_dict:
         cursor = db_connection.cursor()
+        # "UPDATE micro_recommendation SET weight = %s where user_id = %s and recommended_user_id = %s"
         cursor.execute("SELECT MAX(id) FROM micro_recommendation")
         id = cursor.fetchone()[0]
         if (id == None):
             id = 0
         id += 1
         weight = (float) (recommend_dict[rec_id]) / length
-        cursor.execute(add_recommendation % (id, user_id, rec_id, weight))
+        try:
+            cursor.execute(add_recommendation % (id, user_id, rec_id, weight))
+        except:
+            cursor.execute(update_recommendation % (weight, user_id, rec_id))
         db_connection.commit()
        # puts in recommendations one at a time--should be a batch insert?
     cursor.close()
