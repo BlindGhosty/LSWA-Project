@@ -48,16 +48,14 @@ while (k < TOTAL_USERS):
 
         if (next_index in duplicate_list == False):
             duplicate_list.append(i)
-            followee_user = user_array[next_index]
+            	followee_user = user_array[next_index]
             newFollow = Following(follower=follower_user, followee=followee_user, follow_date=timezone.now())
             newFollow.save()
-
         j += 1
-
     k += 1
 
 # HERE WE ADD THE LONE USER W, if we do things correctly, he should live on his own with no followers.
-final_user = "Every_rush_fan_ever"
+final_user = "RUSH_SUCKS"
 temp_user = User.objects.create_user(username=final_user)
 temp_user.set_password(password)
 temp_user.save()
