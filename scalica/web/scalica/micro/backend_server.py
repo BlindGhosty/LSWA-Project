@@ -42,17 +42,13 @@ class GenerateFollowersServicer(backend_pb2_grpc.GenerateFollowersServicer):
 
 def batch_wrapper():
     batch_recommend()
-    """
     margin = 600000000 # batch job downtime in seconds
     while True:
         start_time = time.time()
-        # print "starting batch job"
         batch_recommend()
-        end_time = time.time()
-        diff_time = end_time - start_time
+        diff_time = time.time() - start_time
         if (diff_time < margin):
-            time.sleep(diff_time)
-    """
+            time.sleep(margin - diff_time)
 
 def batch_recommend():
     cursor = db_connection.cursor(buffered=True, dictionary=True)
@@ -65,11 +61,6 @@ def batch_recommend():
         single_recommend(id['id'])
     cursor.close()
     # If problem, restart immediately and like warn somebod
-
-    """
-    theory, you should mark who's been replaced...
-    #! At any time, a user could just be like recommended already so skip him
-    """
 
 def single_recommend(user_id):
     stale_query = "SELECT gen_date FROM micro_time_recommendation_given where user_id = %s"
@@ -86,7 +77,7 @@ def single_recommend(user_id):
         print insert_stale % (user_id, today)
         cursor.execute(insert_stale % (user_id, today))
         db_connection.commit()
-    else
+    else:
         if today - date['gen_date'] < datetime.timedelta(1):
             return
         cursor.execute(update_stale % (today, user_id))
