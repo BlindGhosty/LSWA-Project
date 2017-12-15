@@ -10,10 +10,10 @@ from enum import Enum
 import os
 
 # TODO: Change when deployed
-os.environ['production'] = False
+os.environ['production'] = 'False'
 db_connection = None
 db_conf = None
-if os.environ['production']:
+if os.environ['production'] == 'True':
     db_conf = {
         "host" : "35.196.52.82", #needs to be changed when deployed
         "user" : "appserver",
@@ -55,6 +55,14 @@ class GenerateFollowersServicer(backend_pb2_grpc.GenerateFollowersServicer):
         single_recommend(request.MainUserId)
         return backend_pb2.Void()
 
+stale_query = "SELECT gen_date FROM micro_time_recommendation_given where user_id = %s"
+followee_query = "SELECT followee_id FROM micro_following WHERE follower_id = %s"
+follower_query = "SELECT follower_id FROM micro_following WHERE followee_id = %s"
+add_recommendation = "INSERT INTO micro_recommendation VALUES (%s, %s, %s, %s)"
+update_recommendation = "UPDATE micro_recommendation SET weight = %s where user_id = %s and recommended_user_id = %s"
+insert_stale = "INSERT INTO micro_time_recommendation_given (user_id, gen_date) VALUES (%s, \'%s\')"
+update_stale = "UPDATE micro_time_recommendation_given SET gen_date = \'%s\' where user_id = %s"
+
 def batch_wrapper():
     # batch job, runs between day
     while True:
@@ -76,38 +84,30 @@ def batch_recommend():
     cursor.close()
     # TODO: If problem, restart immediately and like warn somebody?
 
-class querys(Enum):
-    stale_query = "SELECT gen_date FROM micro_time_recommendation_given where user_id = %s"
-    followee_query = "SELECT followee_id FROM micro_following WHERE follower_id = %s"
-    follower_query = "SELECT follower_id FROM micro_following WHERE followee_id = %s"
-    add_recommendation = "INSERT INTO micro_recommendation VALUES (%s, %s, %s, %s)"
-    update_recommendation = "UPDATE micro_recommendation SET weight = %s where user_id = %s and recommended_user_id = %s
-    insert_stale = "INSERT INTO micro_time_recommendation_given (user_id, gen_date) VALUES (%s, \'%s\')"
-    update_stale = "UPDATE micro_time_recommendation_given SET gen_date = \'%s\' where user_id = %s"
-
 def single_recommend(user_id):
     cursor = db_connection.cursor(buffered=True, dictionary=True)
 
     # Checks if user got a rec in the last 24 hours--either from batch or req
-    cursor.execute(querys.stale_query % user_id)
+    cursor.execute(stale_query % user_id)
     date = cursor.fetchone()
     today = datetime.datetime.now()
     if date is None:
-        cursor.execute(querys.insert_stale % (user_id, today))
+        cursor.execute(insert_stale % (user_id, today))
         db_connection.commit()
     else:
         if today - date['gen_date'] < datetime.timedelta(1):
             return
-        cursor.execute(querys.update_stale % (today, user_id))
+        cursor.execute(update_stale % (today, user_id))
         db_connection.commit()
 
-    cursor.execute(querys.followee_query % user_id)
+    cursor.execute(followee_query % user_id)
 
     recommend_dict = {}
+    length = 0
     # A -> {B} -> C
     followee_list = cursor.fetchall()
     for id in followee_list:
-        cursor.execute(querys.followee_query % id['followee_id'])
+        cursor.execute(followee_query % id['followee_id'])
         ids = cursor.fetchall()
         for followee_id in ids:
             temp_id = followee_id['followee_id']
@@ -115,10 +115,12 @@ def single_recommend(user_id):
                 continue
             if (temp_id in recommend_dict.keys()):
                 recommend_dict[temp_id] += 1
+                length += 1
             else:
                 recommend_dict[temp_id] = 1
+                length += 1
 
-    cursor.execute(querys.follower_query % user_id)
+    cursor.execute(follower_query % user_id)
     follower_list = cursor.fetchall() # list of people who follow user
 
     for id in follower_list:
@@ -133,11 +135,12 @@ def single_recommend(user_id):
             continue
         if (temp_id in recommend_dict.keys()):
             recommend_dict[temp_id] += 1
+            length += 1
         else:
             recommend_dict[temp_id] = 1
+            length += 1
 
     # Saves user's recommendations
-    length = len(recommend_dict)
     for rec_id in recommend_dict:
         cursor = db_connection.cursor()
         cursor.execute("SELECT MAX(id) FROM micro_recommendation")
@@ -146,7 +149,7 @@ def single_recommend(user_id):
             id = 0
         id += 1
         weight = (float) (recommend_dict[rec_id]) / length
-        cursor.execute(querys.add_recommendation % (id, user_id, rec_id, weight))
+        cursor.execute(add_recommendation % (id, user_id, rec_id, weight))
         db_connection.commit()
        # puts in recommendations one at a time--should be a batch insert?
     cursor.close()
@@ -154,25 +157,28 @@ def single_recommend(user_id):
 def similarity_recommend(user_id):
     # Doing this efficiently??
     recommend_dict = {}
-    cursor.execute(querys.followee_query % user_id)
+    cursor = db_connection.cursor(buffered=True, dictionary=True)
+    cursor.execute(followee_query % user_id)
     followee_list = cursor.fetchall()
 
+    total_found = 0
     for id in followee_list:
-        cursor.execute(querys.follower_query % id['followee_id'])
+        cursor.execute(follower_query % id['followee_id'])
         ids = cursor.fetchall()
         for followee_id in ids:
-            temp_id = followee_id['followee_id']
+            temp_id = followee_id['follower_id']
             if temp_id is user_id:
                 continue
             if (temp_id in recommend_dict.keys()):
                 recommend_dict[temp_id] += 1
+                total_found += 1
             else:
                 recommend_dict[temp_id] = 1
+                total_found += 1
 
-    cursor.execute(querys.follower_query % user_id)
+    cursor.execute(follower_query % user_id)
     follower_list = cursor.fetchall() # list of people who follow user
 
-    length = len(recommend_dict)
     for rec_id in recommend_dict:
         cursor = db_connection.cursor()
         cursor.execute("SELECT MAX(id) FROM micro_recommendation")
@@ -180,8 +186,9 @@ def similarity_recommend(user_id):
         if (id == None):
             id = 0
         id += 1
-        weight = (float) (recommend_dict[rec_id]) / length
-        cursor.execute(querys.add_recommendation % (id, user_id, rec_id, weight))
+        weight = (float) (recommend_dict[rec_id]) / total_found
+        print weight
+        cursor.execute(add_recommendation % (id, user_id, rec_id, weight))
         db_connection.commit()
 
 def serve():

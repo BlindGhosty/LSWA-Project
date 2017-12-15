@@ -16,8 +16,7 @@ password = "pass"
 # B -> {... Z ..}
 # C -> {... Z ..}
 # Z -> {B, C, D}
-#
-#
+
 user_name = "Yair"
 temp_user = User.objects.create_user(username=user_name)
 temp_user.set_password("josh_homme_innocent!")
@@ -48,13 +47,16 @@ temp_user.set_password(password)
 temp_user.save()
 assert authenticate(username=user_name, password=password)
 
+user_name = "ZPRIME"
+temp_user = User.objects.create_user(username=user_name)
+temp_user.set_password(password)
+temp_user.save()
+assert authenticate(username=user_name, password=password)
+
 user_array = User.objects.all()
 
 # A -> B
 
-user_name = "Yair"
-temp_user = User.objects.create_user(username=user_name)
-temp_user.set_password("never_meet_your_heroes")
 follower_user = user_array[0]
 followee_user = user_array[1]
 
@@ -96,6 +98,22 @@ newFollow.save()
 # Z -> D
 
 follower_user = user_array[4]
+followee_user = user_array[3]
+
+newFollow = Following(follower=follower_user, followee=followee_user, follow_date=timezone.now())
+newFollow.save()
+
+# Z -> C
+
+follower_user = user_array[5]
+followee_user = user_array[2]
+
+newFollow = Following(follower=follower_user, followee=followee_user, follow_date=timezone.now())
+newFollow.save()
+
+# Z -> D
+
+follower_user = user_array[5]
 followee_user = user_array[3]
 
 newFollow = Following(follower=follower_user, followee=followee_user, follow_date=timezone.now())

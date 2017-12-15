@@ -13,9 +13,9 @@ password = "pass"
 # A -> D -> E
 user_name = "Yair"
 temp_user = User.objects.create_user(username=user_name)
-temp_user.set_password("we_don't_like_rush_anymore")
+temp_user.set_password("josh_homme_INNOCENT!")
 temp_user.save()
-assert authenticate(username=user_name, password="never_meet_your_heroes")
+assert authenticate(username=user_name, password="josh_homme_INNOCENT!")
 
 user_name = "B"
 temp_user = User.objects.create_user(username=user_name)

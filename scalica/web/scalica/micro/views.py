@@ -92,9 +92,9 @@ def rpcCall(id):
     try:
         # TODO: Change me on deployment
         import os
-        os.environ['production'] = False
+        os.environ['production'] = 'False'
         channel = None
-        if os.environ['production']:
+        if os.environ['production'] != 'True':
             channel = grpc.insecure_channel('10.142.0.4')
         else:
             channel = grpc.insecure_channel('localhost:20426')
