@@ -62,7 +62,8 @@ def batch_recommend():
 
 def single_recommend(user_id):
     stale_query = "SELECT gen_date FROM micro_time_recommendation_given where user_id = %s"
-    follow_query = "SELECT followee_id FROM micro_following WHERE follower_id = %s"
+    followee_query = "SELECT followee_id FROM micro_following WHERE follower_id = %s"
+    follower_query = "SELECT follower_id FROM micro_following WHERE followee_id = %s"
     add_recommendation = "INSERT INTO micro_recommendation VALUES (%s, %s, %s, %s)"
     insert_stale = "INSERT INTO micro_time_recommendation_given (user_id, gen_date) VALUES (%s, \'%s\')"
     update_stale = "UPDATE micro_time_recommendation_given SET gen_date = '%s' where user_id = %s"
@@ -82,12 +83,13 @@ def single_recommend(user_id):
         cursor.execute(update_stale % (today, user_id))
         db_connection.commit()
 
-    cursor.execute(follow_query % user_id)
+    cursor.execute(followee_query % user_id)
 
     recommend_dict = {}
+    # A -> {B} -> C
     followee_list = cursor.fetchall()
     for id in followee_list:
-        cursor.execute(follow_query % id['followee_id'])
+        cursor.execute(followee_query % id['followee_id'])
         ids = cursor.fetchall()
         for followee_id in ids:
             temp_id = followee_id['followee_id']
@@ -97,6 +99,31 @@ def single_recommend(user_id):
                 recommend_dict[temp_id] += 1
             else:
                 recommend_dict[temp_id] = 1
+
+    # TODO: B → A + A x B; A → B <- Easy! Makes 0 sense for social media
+    cursor.execute(follower_query % user_id)
+    follower_list = cursor.fetchall() # list of people who follow user
+
+    for id in follower_list:
+        if id in followee_list:
+            follower_list.remove(id)
+            continue
+
+    for id in follower_list:
+        temp_id = id['follower_id']
+        if temp_id is user_id:
+            # can't follow yourself in scalica
+            continue
+        if (temp_id in recommend_dict.keys()):
+            recommend_dict[temp_id] += 1
+        else:
+            recommend_dict[temp_id] = 1
+
+
+    # A -> B -> … -> Z. sopop A -> Z <-- also expensive
+    #
+    # A → B; C → B; so A ←→ C <-- Map/Reduce problem; called on the batch; A → {B}; C → {B}; so A ← → C <-
+    #
 
     # Saves user's recommendations
     length = len(recommend_dict)
@@ -112,6 +139,8 @@ def single_recommend(user_id):
         db_connection.commit()
        # puts in recommendations one at a time--should be a batch insert?
     cursor.close()
+
+
 
 def serve():
   server = grpc.server(futures.ThreadPoolExecutor(max_workers=10)) #Change the max???
