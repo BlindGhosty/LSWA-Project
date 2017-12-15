@@ -44,9 +44,10 @@ while (k < TOTAL_USERS):
 
     while (j < MAX_FOLLOWERS):
         # This allows users to only follow users of the same EVEN/ODD type
-        next_index = (random.randint(0,(TOTAL_USERS - 2) / 2)) * 2 + (k % 2)
+        next_index = random.randint(0,(TOTAL_USERS)
 
-        if (next_index in duplicate_list == False):
+
+        if (next_index in duplicate_list == False and (next_index % 2) == (k % 2)):
             duplicate_list.append(i)
             followee_user = user_array[next_index]
             newFollow = Following(follower=follower_user, followee=followee_user, follow_date=timezone.now())
