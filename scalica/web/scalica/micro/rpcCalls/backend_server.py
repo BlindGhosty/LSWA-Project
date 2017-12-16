@@ -191,8 +191,10 @@ def similarity_recommend(user_id):
             id = 0
         id += 1
         weight = (float) (recommend_dict[rec_id]) / total_found
-        print weight
-        cursor.execute(add_recommendation % (id, user_id, rec_id, weight))
+        try:
+            cursor.execute(add_recommendation % (id, user_id, rec_id, weight))
+        except:
+            cursor.execute(update_recommendation % (weight, user_id, rec_id))
         db_connection.commit()
 
 def serve():

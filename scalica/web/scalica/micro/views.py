@@ -137,6 +137,7 @@ def follow(request):
 def recommend(request):
     follow_results = Following.objects.filter(follower_id=request.user).order_by('-follow_date')
     rec_results = Recommendation.objects.filter(user=request.user).order_by('-weight')
+    set(rec_results)
     context = {
         'follows': follow_results,
         'recs': rec_results,
