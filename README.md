@@ -25,4 +25,16 @@
 
 ### Logging On:
  * Username: Yair
- * Password: josh_homme_innocent
+ * Password: josh_homme_INNOCENT!
+
+### Extra stuff:
+ * We had problems with cloud deployment--suspect that CloudSQL is the culprit.
+ * We had to remove the indirect chain logic and the weighting of our algorithms.
+ * In addition, we couldn't get our database cleaning procedure to run properly. That would have fixed the duplication problem.
+
+### Running on Local:
+ * Running the ./liveDemo.sh script clears and repopulates the local sql database with sample data to test the rpc server.
+ * To see the details of the sample data, look under the populate_test_$(#).py scripts
+ * Then, upon running the backend server under micro/rpcCalls with "python backend_server.py", our batch job is initiated.
+ * You could see the results either directly in the SQL table or on the scalica website under our recommendation page.
+ * Running locally works fully as opposed to the state of our cloud deployment.
